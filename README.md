@@ -1,3 +1,3 @@
 # Bulky_MVC
 
-Practice project for Asp.NET Core technology.
+Learning project for Asp.NET Core technology. The project was done with an instructor from Udemy.
