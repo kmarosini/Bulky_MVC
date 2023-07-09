@@ -4,8 +4,9 @@ using Bulky.DataAccess.Repository.IRepository;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace Bulky.DataAccess.Controllers
+namespace BulkyWeb.Areas.Admin.Controllers
 {
+    [Area("Admin")]
     public class CategoryController : Controller
     {
         private readonly ICategoryRepository _categoryRepo;
@@ -48,7 +49,7 @@ namespace Bulky.DataAccess.Controllers
             {
                 return NotFound();
             }
-            Category? categoryFromDb = _categoryRepo.Get(u=>u.Id==id);
+            Category? categoryFromDb = _categoryRepo.Get(u => u.Id == id);
             //Category? categoryFromDb = _db.Categories.FirstOrDefault(c => c.Id == id);
             if (categoryFromDb == null)
             {
@@ -75,7 +76,7 @@ namespace Bulky.DataAccess.Controllers
             {
                 return NotFound();
             }
-            Category? categoryFromDb = _categoryRepo.Get(u=>u.Id == id);
+            Category? categoryFromDb = _categoryRepo.Get(u => u.Id == id);
             //Category? categoryFromDb = _db.Categories.FirstOrDefault(c => c.Id == id);
             if (categoryFromDb == null)
             {
