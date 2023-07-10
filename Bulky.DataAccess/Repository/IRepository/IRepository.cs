@@ -16,6 +16,9 @@ namespace Bulky.DataAccess.Repository.IRepository
         void Remove(T entity);
         void RemoveRange(IEnumerable<T> entity);
 
+        // T - Product 
+        
+
 
 
     }
