@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Bulky.DataAccess.Models
 {
@@ -27,18 +28,21 @@ namespace Bulky.DataAccess.Models
 
         [Required]
         [Display(Name = "Price for 1-50")]
-        [Range(1, 1000)]
+        [Range(1, 50)]
         public double Price { get; set; }
 
         [Required]
         [Display(Name = "Price for 50+")]
-        [Range(1, 1000)]
+        [Range(50, 100)]
         public double Price50 { get; set; }
 
         [Required]
         [Display(Name = "Price for 100+")]
-        [Range(1, 1000)]
+        [Range(100, 1000)]
         public double Price100 { get; set; }
+        public int CategoryId { get; set; }
+        [ForeignKey("CategoryId")]
+        public Category Category { get; set; }
 
     }
 }
