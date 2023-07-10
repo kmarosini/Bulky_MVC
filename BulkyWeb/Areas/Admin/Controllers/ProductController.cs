@@ -1,6 +1,8 @@
 ﻿using Bulky.DataAccess.Models;
 using Bulky.DataAccess.Repository.IRepository;
+using Bulky.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace BulkyWeb.Areas.Admin.Controllers
 {
@@ -8,10 +10,12 @@ namespace BulkyWeb.Areas.Admin.Controllers
     public class ProductController : Controller
     {
         private readonly IProductRepository _productRepo;
+        private readonly ICategoryRepository _categoryRepo;
 
-        public ProductController(IProductRepository db)
+        public ProductController(IProductRepository db, ICategoryRepository cdb)
         {
             _productRepo = db;
+            _categoryRepo = cdb;
         }
 
         public IActionResult Index()
@@ -22,19 +26,38 @@ namespace BulkyWeb.Areas.Admin.Controllers
 
         public IActionResult Create()
         {
-            return View();
+            ProductVM productVM = new()
+            {
+                CategoryList = _categoryRepo.GetAll().ToList().Select(u => new SelectListItem
+                {
+                    Text = u.Name,
+                    Value = u.Id.ToString()
+                }),
+                Product = new Product()
+            };
+             
+            return View(productVM);
         }
         [HttpPost]
-        public IActionResult Create(Product obj)
+        public IActionResult Create(ProductVM productVM)
         {
             if (ModelState.IsValid)
             {
-                _productRepo.Add(obj);
+                _productRepo.Add(productVM.Product);
                 _productRepo.Save();
                 TempData["success"] = "Product created successfully!";
                 return RedirectToAction("Index", "Product");
+            } 
+            else
+            {
+                productVM.CategoryList = _categoryRepo.GetAll().ToList().Select(u => new SelectListItem
+                {
+                    Text = u.Name,
+                    Value = u.Id.ToString()
+                });
+                return View(productVM);
+
             }
-            return View();
 
         }
 
