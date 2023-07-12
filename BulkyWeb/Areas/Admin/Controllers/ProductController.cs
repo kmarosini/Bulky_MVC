@@ -22,7 +22,7 @@ namespace BulkyWeb.Areas.Admin.Controllers
 
         public IActionResult Index()
         {
-            List<Product> objProductList = _productRepo.GetAll().ToList();
+            List<Product> objProductList = _productRepo.GetAll(includeProperties:"Category").ToList();
             return View(objProductList);
         }
 
@@ -60,6 +60,17 @@ namespace BulkyWeb.Areas.Admin.Controllers
                     string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
                     string productPath = Path.Combine(wwwRootPath, @"images\product");
 
+                    if (!string.IsNullOrEmpty(productVM.Product.ImageUrl))
+                    {
+                        // delete old image
+                        var oldImagePath = Path.Combine(wwwRootPath, productVM.Product.ImageUrl.TrimStart('\\'));
+
+                        if (System.IO.File.Exists(oldImagePath))
+                        {
+                            System.IO.File.Delete(oldImagePath);
+                        }
+                    }
+
                     using( var fileStream = new FileStream(Path.Combine(productPath, fileName), FileMode.Create))
                     {
                         file.CopyTo(fileStream);
@@ -67,7 +78,16 @@ namespace BulkyWeb.Areas.Admin.Controllers
 
                     productVM.Product.ImageUrl = @"\images\product\" + fileName;
                 }
-                _productRepo.Add(productVM.Product);
+
+                if (productVM.Product.Id == 0)
+                {
+                    _productRepo.Add(productVM.Product);
+                }
+                else
+                {
+                    _productRepo.Update(productVM.Product);
+                }
+
                 _productRepo.Save();
                 TempData["success"] = "Product created successfully!";
                 return RedirectToAction("Index", "Product");
@@ -112,6 +132,15 @@ namespace BulkyWeb.Areas.Admin.Controllers
             TempData["success"] = "Product deleted successfully!";
             return RedirectToAction("Index", "Product");
         }
+
+        #region API CALLS
+        [HttpGet]
+        public IActionResult GetAll()
+        {
+            List<Product> objProductList = _productRepo.GetAll(includeProperties:"Category").ToList();
+            return Json(new {data = objProductList});
+        }
+        #endregion
     }
 }
 
