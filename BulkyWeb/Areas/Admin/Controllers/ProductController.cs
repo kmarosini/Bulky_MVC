@@ -10,12 +10,14 @@ namespace BulkyWeb.Areas.Admin.Controllers
     public class ProductController : Controller
     {
         private readonly IProductRepository _productRepo;
+        private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly ICategoryRepository _categoryRepo;
 
-        public ProductController(IProductRepository db, ICategoryRepository cdb)
+        public ProductController(IProductRepository db, ICategoryRepository cdb, IWebHostEnvironment webHostEnvironment)
         {
             _productRepo = db;
             _categoryRepo = cdb;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         public IActionResult Index()
@@ -52,6 +54,19 @@ namespace BulkyWeb.Areas.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
+                string wwwRootPath = _webHostEnvironment.WebRootPath;
+                if (file != null)
+                {
+                    string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                    string productPath = Path.Combine(wwwRootPath, @"images\product");
+
+                    using( var fileStream = new FileStream(Path.Combine(productPath, fileName), FileMode.Create))
+                    {
+                        file.CopyTo(fileStream);
+                    }
+
+                    productVM.Product.ImageUrl = @"\images\product\" + fileName;
+                }
                 _productRepo.Add(productVM.Product);
                 _productRepo.Save();
                 TempData["success"] = "Product created successfully!";
